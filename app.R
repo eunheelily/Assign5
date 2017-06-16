@@ -11,17 +11,21 @@ library(shiny)
 library(leaflet)
 library(tidyverse)
 CA <- read_delim("CA.csv", delim="|")
+
 shinyApp(
 ui = fluidPage(
   headerPanel('Spatial data by feature'),
   sidebarPanel(
-  selectInput(inputId="feature", label="Select a feature",c("Park","School", "Valley", "Spring", "Tunnel", "Stream","Gut","Mind","Train","Summit","Reservoir"))),mainPanel( 
+  selectInput(inputId="feature", label="Select a feature",c("Park","School", "Valley", "Spring", "Tunnel", "Stream","Gut","Mind","Train","Summit","Reservoir")),
+  sliderInput(inputId="trans", label="Select a opacity", min=0, max=1, value=0.35)
+  ),mainPanel( 
   leafletOutput("mymap"))),
 
 
 server = function(input, output) {
   output$mymap <- renderLeaflet({
-    leaflet() %>% addTiles()%>% 
+    leaflet() %>% addProviderTiles(providers$Stamen.TonerLines,
+                                   options = providerTileOptions(opacity = input$trans)) %>% 
       setView(lng = -120, lat = 38, zoom = 9)})
     observe({
         sites <- CA %>% 
